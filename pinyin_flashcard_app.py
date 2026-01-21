@@ -1,117 +1,81 @@
+# ==============================
+# PHẦN 1: HỌC BẢNG CHỮ CÁI PINYIN
+# ==============================
+
 import streamlit as st
-import random
 from gtts import gTTS
 import io
 
-# ----------------------
-# DATA: Taiwan Mandarin Flashcards
-# ----------------------
-flashcards = [
-    {
-        "hanzi": "你好",
-        "zhuyin": "ㄋㄧˇ ㄏㄠˇ",
-        "pinyin": "nǐ hǎo",
-        "meaning": "Xin chào"
-    },
-    {
-        "hanzi": "謝謝",
-        "zhuyin": "ㄒㄧㄝˋ ㄒㄧㄝ˙",
-        "pinyin": "xiè xie",
-        "meaning": "Cảm ơn"
-    },
-    {
-        "hanzi": "再見",
-        "zhuyin": "ㄗㄞˋ ㄐㄧㄢˋ",
-        "pinyin": "zài jiàn",
-        "meaning": "Tạm biệt"
-    },
-    {
-        "hanzi": "是",
-        "zhuyin": "ㄕˋ",
-        "pinyin": "shì",
-        "meaning": "Là / Phải"
-    },
-    {
-        "hanzi": "不是",
-        "zhuyin": "ㄅㄨˊ ㄕˋ",
-        "pinyin": "bú shì",
-        "meaning": "Không phải"
-    }
+# -------- DATA --------
+initials = [
+    "b", "p", "m", "f",
+    "d", "t", "n", "l",
+    "g", "k", "h",
+    "j", "q", "x",
+    "zh", "ch", "sh", "r",
+    "z", "c", "s"
 ]
 
-# ----------------------
-# FUNCTIONS
-# ----------------------
+finals = [
+    "a", "o", "e", "i", "u", "ü",
+    "ai", "ei", "ao", "ou",
+    "an", "en", "ang", "eng",
+    "ong", "er"
+]
+
+tones = {
+    "ā": "Thanh 1 (cao – ngang)",
+    "á": "Thanh 2 (lên)",
+    "ǎ": "Thanh 3 (xuống rồi lên)",
+    "à": "Thanh 4 (xuống mạnh)"
+}
+
+# -------- AUDIO FUNCTION --------
 def play_audio(text):
     tts = gTTS(text=text, lang="zh-TW")
     audio_bytes = io.BytesIO()
     tts.write_to_fp(audio_bytes)
     st.audio(audio_bytes.getvalue(), format="audio/mp3")
 
-def next_card():
-    st.session_state.card = random.choice(flashcards)
-    st.session_state.show_answer = False
+# -------- UI --------
+st.title("🔤 Phần 1: Học bảng chữ cái Pinyin")
+st.caption("Nền tảng phát âm – học theo phong cách Đài Loan 🇹🇼")
 
-# ----------------------
-# SESSION STATE
-# ----------------------
-if "card" not in st.session_state:
-    st.session_state.card = random.choice(flashcards)
-    st.session_state.show_answer = False
-
-# ----------------------
-# UI
-# ----------------------
-st.set_page_config(
-    page_title="Taiwan Mandarin Flashcards",
-    page_icon="🇹🇼",
-    layout="centered"
+tab1, tab2, tab3 = st.tabs(
+    ["🅰️ Thanh mẫu (Initials)", "🅱️ Vận mẫu (Finals)", "🎵 Thanh điệu (Tones)"]
 )
 
-st.title("🇹🇼 Taiwan Mandarin Flashcards")
-st.caption("Phồn thể • Zhuyin • Giọng Đài Loan")
+# -------- INITIALS --------
+with tab1:
+    st.subheader("Thanh mẫu (聲母)")
+    st.write("👉 Nhấn vào từng âm để nghe phát âm")
 
-card = st.session_state.card
+    cols = st.columns(6)
+    for i, sound in enumerate(initials):
+        with cols[i % 6]:
+            if st.button(sound, key=f"init_{sound}"):
+                play_audio(sound)
 
-# Flashcard display
-st.markdown(
-    f"""
-    <div style="
-        border: 3px solid #e5e7eb;
-        border-radius: 20px;
-        padding: 35px;
-        text-align: center;
-        font-size: 42px;
-        background-color: #ffffff;
-        box-shadow: 0px 4px 10px rgba(0,0,0,0.05);
-        ">
-        {card['hanzi']}
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+# -------- FINALS --------
+with tab2:
+    st.subheader("Vận mẫu (韻母)")
+    st.write("👉 Luyện phát âm phần nguyên âm")
 
-st.write("")
+    cols = st.columns(6)
+    for i, sound in enumerate(finals):
+        with cols[i % 6]:
+            if st.button(sound, key=f"fin_{sound}"):
+                play_audio(sound)
 
-col1, col2, col3 = st.columns(3)
+# -------- TONES --------
+with tab3:
+    st.subheader("Thanh điệu (聲調)")
+    st.write("👉 Nghe và cảm nhận cao độ")
 
-with col1:
-    if st.button("👀 看答案"):
-        st.session_state.show_answer = True
-
-with col2:
-    if st.button("🔊 聽發音"):
-        play_audio(card["hanzi"])
-
-with col3:
-    if st.button("➡️ 下一個"):
-        next_card()
-
-# ----------------------
-# ANSWER
-# ----------------------
-if st.session_state.show_answer:
-    st.markdown("### 📖 單字資訊")
-    st.write(f"**注音 (Zhuyin):** {card['zhuyin']}")
-    st.write(f"**Pinyin:** {card['pinyin']}")
-    st.write(f"**Nghĩa:** {card['meaning']}")
+    for tone, desc in tones.items():
+        col1, col2 = st.columns([1, 4])
+        with col1:
+            if st.button(tone, key=f"tone_{tone}"):
+                play_audio(tone)
+        with col2:
+            st.write(desc)
