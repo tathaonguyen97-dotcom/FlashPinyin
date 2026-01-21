@@ -1,0 +1,11 @@
+# 🇹🇼 Taiwan Mandarin Flashcard App
+
+A Streamlit web app to learn Taiwan Mandarin with:
+- Traditional Chinese
+- Zhuyin (Bopomofo)
+- Audio (Taiwan accent)
+
+## Run locally
+```bash
+pip install -r requirements.txt
+streamlit run taiwan_mandarin_flashcard.py
