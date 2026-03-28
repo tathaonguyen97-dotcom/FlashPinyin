@@ -31,11 +31,18 @@ mode = st.radio("Chọn chế độ:", ["Flashcard", "Quiz"])
 
 # ================= AUDIO =================
 def play_audio(text):
-    tts = gTTS(text=text, lang='zh-tw')
-    file = "audio.mp3"
-    tts.save(file)
-    audio_file = open(file, 'rb')
-    st.audio(audio_file.read(), format='audio/mp3')
+    try:
+        tts = gTTS(text=text, lang='zh-TW')
+        file_path = "temp_audio.mp3"
+        tts.save(file_path)
+
+        with open(file_path, "rb") as f:
+            audio_bytes = f.read()
+
+        st.audio(audio_bytes, format="audio/mp3")
+
+    except Exception as e:
+        st.error(f"Audio lỗi: {e}")
 
 # ================= FLASHCARD MODE =================
 if mode == "Flashcard":
